@@ -35,9 +35,37 @@ namespace csharp_sorting_algorithms
             };
 
             var results = Task.WhenAll(tasks);
+            
+            UserInterface(tasks);
+        }
 
+        public static void UserInterface(Task<int[]>[] tasks){
 
-            //Console.WriteLine(String.Join(',', tasks[2].Result ));
+            Console.Write("Choose a type of sorting: \n1) Bubble Sort\n2) Selection Sort\n3) Insertion Sort\n--> ");
+
+            var key = Console.ReadKey().KeyChar;
+
+            if(char.IsDigit(key))
+            {
+                var index = Int32.Parse(key.ToString().Substring(0,1));
+
+                if(index > 0 && index <= tasks.Length)
+                {
+                    Console.WriteLine("\nRESULT: {0}", String.Join(',', tasks[index - 1].Result ));
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("\nInvalid value... try again.");
+                    UserInterface(tasks);
+                }
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("\nInvalid value... try again.");
+                UserInterface(tasks);
+            }
         }
 
     }
