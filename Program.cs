@@ -74,7 +74,6 @@ namespace csharp_sorting_algorithms
         }
 
         private static void UserInterface(int[] nums){
-            //Console.WriteLine("Your Random Array: {0}", String.Join(',', nums));
             Console.Write($"Choose a type of sorting: \n1) Bubble Sort\n2) Selection Sort\n3) Insertion Sort\n4) Quick Sort\n5) Run All\n-->");
 
             var key = Console.ReadKey().KeyChar;
@@ -91,7 +90,7 @@ namespace csharp_sorting_algorithms
 
                     Task.WhenAll(tasks);
 
-                    //Console.WriteLine("\nRESULT: {0}\n", String.Join(',', tasks[0].Result ));
+                    Console.WriteLine("\nSorted: {0}\n", String.Join(',', tasks[0].Result ));
                     UserInterface(nums);
                 }
                 else
