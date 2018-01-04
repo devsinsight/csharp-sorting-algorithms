@@ -1,8 +1,8 @@
 namespace csharp_sorting_algorithms
 {
-    public class BubbleSort : ISort
+    public class BubbleSort : CustomSort
     {
-        public void Sort(int[] numbers){
+        public override void Sort(int[] numbers){
             bool swapped;
 
             for(int i = 0; i < numbers.Length - 1; i++){

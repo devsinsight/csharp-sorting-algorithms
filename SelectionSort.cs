@@ -1,8 +1,8 @@
 namespace csharp_sorting_algorithms
 {
-    public class SelectionSort : ISort
+    public class SelectionSort : CustomSort
     {
-        public void Sort(int[] numbers)
+        public override void Sort(int[] numbers)
         {
             for(int k=0; k < numbers.Length - 1; k++){
                 int min_index = k;

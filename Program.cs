@@ -11,11 +11,20 @@ namespace csharp_sorting_algorithms
         private static Type Default = typeof(BubbleSort);
         public static Task<int[]> CustomSort(this int[] numbers, Type type = null){
             var t = type ?? Default;
-            var s = (ISort) Activator.CreateInstance(t);
+            var s = (CustomSort) Activator.CreateInstance(t);
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            s.Sort(numbers);
+
+            switch(t.Name){
+                case "QuickSort":
+                    s.Sort(numbers, 0, numbers.Length);
+                    break;
+                default:
+                    s.Sort(numbers);
+                    break;
+            }
+            
             stopwatch.Stop();
 
             Console.WriteLine("Time elapsed for {0}: {1}", t.Name, stopwatch.Elapsed);
@@ -24,47 +33,75 @@ namespace csharp_sorting_algorithms
     }
     class Program
     {
+        private static Dictionary<int, Type> SortTypes = 
+        new Dictionary<int, Type>(){
+            { 1, typeof(BubbleSort) },
+            { 2, typeof(SelectionSort) },
+            { 3, typeof(InsertionSort) },
+            { 4, typeof(QuickSort) }
+        };
         static void Main(string[] args)
         {
             int[] nums = new int[]{1,5,1,2,6,4};
 
-            var tasks = new Task<int[]>[] {
-                nums.CustomSort(typeof(BubbleSort)),
-                nums.CustomSort(typeof(SelectionSort)),
-                nums.CustomSort(typeof(InsertionSort))
-            };
-
-            var results = Task.WhenAll(tasks);
-            
-            UserInterface(tasks);
+            UserInterface(nums);
         }
 
-        public static void UserInterface(Task<int[]>[] tasks){
+        private static Task<int[]>[] GetSortTypes(int[] nums){
+            return new Task<int[]>[] {
+                nums.CustomSort(typeof(BubbleSort)),
+                nums.CustomSort(typeof(SelectionSort)),
+                nums.CustomSort(typeof(InsertionSort)),
+                nums.CustomSort(typeof(QuickSort))
+            };
+        }
 
-            Console.Write("Choose a type of sorting: \n1) Bubble Sort\n2) Selection Sort\n3) Insertion Sort\n--> ");
+        private static Task<int[]>[] RunAllSort(int[] nums){
+            return GetSortTypes(nums);
+        }
+
+        private static Task<int[]>[] RunSort(int[] nums, int selectedType){
+            return new Task<int[]>[]{ nums.CustomSort(SortTypes[selectedType]) };
+        }
+
+        private static Task<int[]>[] Run(int[] nums, int selectedType){
+            return selectedType > 4 ? RunAllSort(nums) : RunSort(nums, selectedType);
+
+        }
+
+        private static void UserInterface(int[] nums){
+
+            Console.Write($"Choose a type of sorting: \n1) Bubble Sort\n2) Selection Sort\n3) Insertion Sort\n4) Quick Sort\n5) Run All\n-->");
 
             var key = Console.ReadKey().KeyChar;
 
             if(char.IsDigit(key))
             {
-                var index = Int32.Parse(key.ToString().Substring(0,1));
+                var selectedType = Int32.Parse(key.ToString().Substring(0,1));
 
-                if(index > 0 && index <= tasks.Length)
+                if(selectedType > 0 && selectedType <= 5)
                 {
-                    Console.WriteLine("\nRESULT: {0}", String.Join(',', tasks[index - 1].Result ));
+                    Console.Clear();
+                    
+                    var tasks = Run(nums, selectedType);
+
+                    Task.WhenAll(tasks);
+
+                    Console.WriteLine("\nRESULT: {0}\n", String.Join(',', tasks[0].Result ));
+                    UserInterface(nums);
                 }
                 else
                 {
                     Console.Clear();
-                    Console.WriteLine("\nInvalid value... try again.");
-                    UserInterface(tasks);
+                    Console.WriteLine("\nInvalid Option... Try Again.");
+                    UserInterface(nums);
                 }
             }
             else
             {
                 Console.Clear();
-                Console.WriteLine("\nInvalid value... try again.");
-                UserInterface(tasks);
+                Console.WriteLine("\nInvalid Option... Try Again.");
+                UserInterface(nums);
             }
         }
 

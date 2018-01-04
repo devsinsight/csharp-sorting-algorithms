@@ -1,8 +1,8 @@
 namespace csharp_sorting_algorithms
 {
-    public class InsertionSort : ISort
+    public class InsertionSort : CustomSort
     {
-        public void Sort(int[] numbers)
+        public override void Sort(int[] numbers)
         {
             int j;
             for(int i = 1; i < numbers.Length; i++){
