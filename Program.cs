@@ -8,15 +8,13 @@ namespace csharp_sorting_algorithms
 {
 
     public static class SortApplication {
-        private static Type Default = typeof(BubbleSort);
-        public static Task<int[]> CustomSort(this int[] numbers, Type type = null){
-            var t = type ?? Default;
-            var s = (CustomSort) Activator.CreateInstance(t);
+        public static Task<int[]> CustomSort(this int[] numbers, Type type){
+            var s = (CustomSort) Activator.CreateInstance(type);
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            switch(t.Name){
+            switch(type.Name){
                 case "QuickSort":
                     s.Sort(numbers, 0, numbers.Length);
                     break;
@@ -27,7 +25,7 @@ namespace csharp_sorting_algorithms
             
             stopwatch.Stop();
 
-            Console.WriteLine("Time elapsed for {0}: {1}", t.Name, stopwatch.Elapsed);
+            Console.WriteLine("Time elapsed for {0}: {1}", type.Name, stopwatch.Elapsed);
             return Task.FromResult(numbers);
         }
     }
@@ -42,7 +40,13 @@ namespace csharp_sorting_algorithms
         };
         static void Main(string[] args)
         {
-            int[] nums = new int[]{1,5,1,2,6,4};
+            int[] nums = new int[20]; 
+
+            Random randNum = new Random();
+            for (int i = 0; i < nums.Length; i++)
+            {
+                nums[i] = randNum.Next(1, 20);
+            }
 
             UserInterface(nums);
         }
@@ -70,7 +74,7 @@ namespace csharp_sorting_algorithms
         }
 
         private static void UserInterface(int[] nums){
-
+            //Console.WriteLine("Your Random Array: {0}", String.Join(',', nums));
             Console.Write($"Choose a type of sorting: \n1) Bubble Sort\n2) Selection Sort\n3) Insertion Sort\n4) Quick Sort\n5) Run All\n-->");
 
             var key = Console.ReadKey().KeyChar;
@@ -82,12 +86,12 @@ namespace csharp_sorting_algorithms
                 if(selectedType > 0 && selectedType <= 5)
                 {
                     Console.Clear();
-                    
+
                     var tasks = Run(nums, selectedType);
 
                     Task.WhenAll(tasks);
 
-                    Console.WriteLine("\nRESULT: {0}\n", String.Join(',', tasks[0].Result ));
+                    //Console.WriteLine("\nRESULT: {0}\n", String.Join(',', tasks[0].Result ));
                     UserInterface(nums);
                 }
                 else
