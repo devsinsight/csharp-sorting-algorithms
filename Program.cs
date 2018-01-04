@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace csharp_sorting_algorithms
 {
 
-    public static class Utils {
+    public static class SortApplication {
         private static Type Default = typeof(BubbleSort);
         public static Task<int[]> CustomSort(this int[] numbers, Type type = null){
             var t = type ?? Default;
