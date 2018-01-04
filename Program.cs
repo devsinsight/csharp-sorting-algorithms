@@ -51,17 +51,13 @@ namespace csharp_sorting_algorithms
             UserInterface(nums);
         }
 
-        private static Task<int[]>[] GetSortTypes(int[] nums){
+        private static Task<int[]>[] RunAllSort(int[] nums){
             return new Task<int[]>[] {
                 nums.CustomSort(typeof(BubbleSort)),
                 nums.CustomSort(typeof(SelectionSort)),
                 nums.CustomSort(typeof(InsertionSort)),
                 nums.CustomSort(typeof(QuickSort))
             };
-        }
-
-        private static Task<int[]>[] RunAllSort(int[] nums){
-            return GetSortTypes(nums);
         }
 
         private static Task<int[]>[] RunSort(int[] nums, int selectedType){
