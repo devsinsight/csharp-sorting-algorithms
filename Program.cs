@@ -45,7 +45,6 @@ namespace csharp_sorting_algorithms
         }
 
         private static Task<int[][]> Execute(int[] nums, int option){
-            
             return Task.WhenAll(option > 4 ? ExecuteAllSort(nums) : ExecuteSingleSort(nums, option));
         }
 
@@ -95,8 +94,7 @@ namespace csharp_sorting_algorithms
         }
 
         private static int[] GetResult(Task<int[][]> tasks){
-            var results = tasks.Result;
-            return results.Last();
+            return tasks.Result.Last();
         }
 
     }
