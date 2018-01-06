@@ -6,40 +6,21 @@ using System.Threading.Tasks;
 
 namespace csharp_sorting_algorithms
 {
-
-    public static class SortApplication {
-        public static Task<int[]> CustomSort(this int[] numbers, Type type){
-            var s = (CustomSort) Activator.CreateInstance(type);
-
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            switch(type.Name){
-                case "QuickSort":
-                    s.Sort(numbers, 0, numbers.Length);
-                    break;
-                default:
-                    s.Sort(numbers);
-                    break;
-            }
-            
-            stopwatch.Stop();
-
-            Console.WriteLine("Time elapsed for {0}: {1}", type.Name, stopwatch.Elapsed);
-            return Task.FromResult(numbers);
-        }
-    }
     class Program
     {
         private static Dictionary<int, Type> SortTypes = 
-        new Dictionary<int, Type>(){
-            { 1, typeof(BubbleSort) },
-            { 2, typeof(SelectionSort) },
-            { 3, typeof(InsertionSort) },
-            { 4, typeof(QuickSort) }
-        };
+            new Dictionary<int, Type>(){
+                { 1, typeof(BubbleSort) },
+                { 2, typeof(SelectionSort) },
+                { 3, typeof(InsertionSort) },
+                { 4, typeof(QuickSort) }
+            };
         static void Main(string[] args)
         {
+            SortMenuApplication(GetRandomNumbers());
+        }
+
+        private static int[] GetRandomNumbers(){
             int[] nums = new int[20]; 
 
             Random randNum = new Random();
@@ -47,11 +28,10 @@ namespace csharp_sorting_algorithms
             {
                 nums[i] = randNum.Next(1, 20);
             }
-
-            UserInterface(nums);
+            return nums;
         }
 
-        private static Task<int[]>[] RunAllSort(int[] nums){
+        private static Task<int[]>[] ExecuteAllSort(int[] nums){
             return new Task<int[]>[] {
                 nums.CustomSort(typeof(BubbleSort)),
                 nums.CustomSort(typeof(SelectionSort)),
@@ -60,48 +40,63 @@ namespace csharp_sorting_algorithms
             };
         }
 
-        private static Task<int[]>[] RunSort(int[] nums, int selectedType){
-            return new Task<int[]>[]{ nums.CustomSort(SortTypes[selectedType]) };
+        private static Task<int[]>[] ExecuteSingleSort(int[] nums, int option){
+            return new Task<int[]>[]{ nums.CustomSort(SortTypes[option]) };
         }
 
-        private static Task<int[]>[] Run(int[] nums, int selectedType){
-            return selectedType > 4 ? RunAllSort(nums) : RunSort(nums, selectedType);
-
+        private static Task<int[][]> Execute(int[] nums, int option){
+            
+            return Task.WhenAll(option > 4 ? ExecuteAllSort(nums) : ExecuteSingleSort(nums, option));
         }
 
-        private static void UserInterface(int[] nums){
-            Console.Write($"Choose a type of sorting: \n1) Bubble Sort\n2) Selection Sort\n3) Insertion Sort\n4) Quick Sort\n5) Run All\n-->");
+        private static void SortMenuApplication(int[] nums){
+            PrintMenuOptions();
 
-            var key = Console.ReadKey().KeyChar;
+            var option = GetKeyFromConsole();
 
-            if(char.IsDigit(key))
+            if(option > 0 && option <= 5)
             {
-                var selectedType = Int32.Parse(key.ToString().Substring(0,1));
-
-                if(selectedType > 0 && selectedType <= 5)
-                {
-                    Console.Clear();
-
-                    var tasks = Run(nums, selectedType);
-
-                    Task.WhenAll(tasks);
-
-                    Console.WriteLine("\nSorted: {0}\n", String.Join(',', tasks[0].Result ));
-                    UserInterface(nums);
-                }
-                else
-                {
-                    Console.Clear();
-                    Console.WriteLine("\nInvalid Option... Try Again.");
-                    UserInterface(nums);
-                }
+                Console.Clear();
+                PrintSuccessResult(GetResult(Execute(nums, option)));
+                SortMenuApplication(nums);
             }
             else
             {
-                Console.Clear();
-                Console.WriteLine("\nInvalid Option... Try Again.");
-                UserInterface(nums);
+                PrintInvalidOption(nums);
+                SortMenuApplication(nums);
             }
+        }
+
+        private static void PrintMenuOptions(){
+            Console.Write($"Choose a type of sorting:" +
+                            "\n1) Bubble Sort" +
+                            "\n2) Selection Sort" +
+                            "\n3) Insertion Sort" +
+                            "\n4) Quick Sort" +
+                            "\n5) Run All\n-->");
+        }
+
+        private static int GetKeyFromConsole(){
+            var key = Console.ReadKey().KeyChar;
+            return char.IsDigit(key) ? Int32.Parse(key.ToString().Substring(0,1)) : 0;
+        }
+
+        private static void PrintInvalidOption(int[] nums){
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Invalid Option... Try Again.");
+            Console.ResetColor();
+        }
+
+        private static void PrintSuccessResult(int[] result){
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Sorted: {0}\n", String.Join(',', result ));
+            Console.ResetColor();
+        }
+
+        private static int[] GetResult(Task<int[][]> tasks){
+            var results = tasks.Result;
+            return results.Last();
         }
 
     }
