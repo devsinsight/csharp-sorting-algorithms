@@ -31,23 +31,6 @@ namespace csharp_sorting_algorithms
             return nums;
         }
 
-        private static Task<int[]>[] ExecuteAllSort(int[] nums){
-            return new Task<int[]>[] {
-                nums.CustomSort(typeof(BubbleSort)),
-                nums.CustomSort(typeof(SelectionSort)),
-                nums.CustomSort(typeof(InsertionSort)),
-                nums.CustomSort(typeof(QuickSort))
-            };
-        }
-
-        private static Task<int[]>[] ExecuteSingleSort(int[] nums, int option){
-            return new Task<int[]>[]{ nums.CustomSort(SortTypes[option]) };
-        }
-
-        private static Task<int[][]> Execute(int[] nums, int option){
-            return Task.WhenAll(option > 4 ? ExecuteAllSort(nums) : ExecuteSingleSort(nums, option));
-        }
-
         private static void SortMenuApplication(int[] nums){
             PrintMenuOptions();
 
@@ -80,6 +63,27 @@ namespace csharp_sorting_algorithms
             return char.IsDigit(key) ? Int32.Parse(key.ToString().Substring(0,1)) : 0;
         }
 
+        private static Task<int[][]> Execute(int[] nums, int option){
+            return Task.WhenAll(option > 4 ? ExecuteAllSort(nums) : ExecuteSingleSort(nums, option));
+        }
+
+        private static Task<int[]>[] ExecuteAllSort(int[] nums){
+            return new Task<int[]>[] {
+                nums.CustomSort(typeof(BubbleSort)),
+                nums.CustomSort(typeof(SelectionSort)),
+                nums.CustomSort(typeof(InsertionSort)),
+                nums.CustomSort(typeof(QuickSort))
+            };
+        }
+
+        private static Task<int[]>[] ExecuteSingleSort(int[] nums, int option){
+            return new Task<int[]>[]{ nums.CustomSort(SortTypes[option]) };
+        }
+
+        private static int[] GetResult(Task<int[][]> tasks){
+            return tasks.Result.Last();
+        }
+
         private static void PrintInvalidOption(int[] nums){
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Red;
@@ -91,10 +95,6 @@ namespace csharp_sorting_algorithms
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Sorted: {0}\n", String.Join(',', result ));
             Console.ResetColor();
-        }
-
-        private static int[] GetResult(Task<int[][]> tasks){
-            return tasks.Result.Last();
         }
 
     }
